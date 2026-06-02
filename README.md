@@ -4,8 +4,8 @@ A modern analytics dashboard built with React, Vite, shadcn/ui, and Supabase Aut
 
 ## Live Demo
 
-- **URL:** https://novaanalytics.onrender.com
-- **Test credentials:** `admin@novaanalytics.io` / _(provided separately)_
+- **URL:** https://nova-analytics.onrender.com
+- **Test credentials:** `admin@novaanalytics.io` / `Admin1234!`
 
 ## Features
 
@@ -13,6 +13,9 @@ A modern analytics dashboard built with React, Vite, shadcn/ui, and Supabase Aut
 - Supabase email/password authentication (sign up, sign in, sign out)
 - Protected dashboard routes — unauthenticated users are redirected to sign in
 - Dashboard with charts, tasks, users, apps, chats, and settings pages
+- App integrations with connect/disconnect toggle
+- Functional chat with real-time message state
+- Dashboard CSV export
 - Light/dark mode
 - Fully responsive (mobile + desktop)
 - Nova Analytics branding (indigo/violet color palette)
@@ -32,13 +35,14 @@ A modern analytics dashboard built with React, Vite, shadcn/ui, and Supabase Aut
 | Charts | Recharts v3 |
 | Testing | Vitest + Playwright |
 | Deploy | Render Static Site |
+| CI | GitHub Actions |
 
 ## Getting Started Locally
 
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/AragonRogelio/nova-analytics.git
+git clone https://github.com/FernandoArago/nova-analytics.git
 cd nova-analytics
 ```
 
@@ -80,10 +84,20 @@ Visit `http://localhost:5173`.
 
 1. Push the repo to GitHub
 2. Create a new **Static Site** on [render.com](https://render.com)
-3. Set build command: `npm run build`
+3. Set build command: `npm install && npm run build`
 4. Set publish directory: `dist`
 5. Add environment variables: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
 6. Deploy — Render auto-deploys on every push to `main`
+
+## CI/CD
+
+GitHub Actions runs on every push to `main`:
+- Installs dependencies
+- Lints and format-checks the code
+- Runs the test suite
+- Builds the project
+
+Secrets required in GitHub repository settings: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`.
 
 ## Project Structure
 
@@ -92,11 +106,12 @@ src/
 ├── features/
 │   ├── landing/        ← Public landing page
 │   ├── auth/           ← Sign in, sign up, forgot password
-│   ├── dashboard/      ← Main dashboard
-│   ├── users/          ← User management
-│   ├── tasks/          ← Task list
-│   ├── chats/          ← Chat UI
-│   └── settings/       ← Account settings
+│   ├── dashboard/      ← Main dashboard with CSV export
+│   ├── users/          ← User management (full CRUD)
+│   ├── tasks/          ← Task list (full CRUD)
+│   ├── apps/           ← App integrations (connect/disconnect)
+│   ├── chats/          ← Chat UI with message state
+│   └── settings/       ← Account, appearance, notifications
 ├── routes/
 │   ├── index.tsx           ← / (landing page, public)
 │   ├── _authenticated/     ← Protected layout (Supabase session guard)
@@ -105,12 +120,19 @@ src/
 ├── lib/
 │   └── supabase.ts     ← Supabase client
 └── stores/
-    └── auth-store.ts   ← Zustand auth state
+    └── auth-store.ts   ← Zustand auth state (Supabase Session)
 ```
+
+## Known Limitations
+
+- **Dashboard data is mocked** — charts, metrics, users, tasks, and chats use hardcoded data. A real implementation would connect to a backend API or Supabase tables.
+- **App integrations are local state only** — connect/disconnect toggles reset on page refresh. No persistence layer.
+- **Chat messages are session-only** — sent messages exist in React state and are lost on refresh.
+- **Clerk routes still present** — `src/routes/clerk/` contains the original template's Clerk auth pages. They are unreachable from the UI but not removed to preserve git history clarity.
 
 ## Base Project
 
-This project is a whitelabel fork of [satnaing/shadcn-admin](https://github.com/satnaing/shadcn-admin) (MIT License), customized for Nova Analytics as part of a trial assignment for Dot Com Media.
+This project is a whitelabel fork of [satnaing/shadcn-admin](https://github.com/satnaing/shadcn-admin) (MIT License), customized for Nova Analytics as a trial assignment for Dot Com Media.
 
 ## License
 
