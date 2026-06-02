@@ -26,6 +26,10 @@ dist-ssr
 *.sln
 *.sw?
 
+# Auto-generated
+.tanstack/
+package-lock.json
+
 # Test coverage
 /coverage
 
