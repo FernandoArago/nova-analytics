@@ -28,7 +28,6 @@ dist-ssr
 
 # Auto-generated
 .tanstack/
-package-lock.json
 
 # Test coverage
 /coverage
