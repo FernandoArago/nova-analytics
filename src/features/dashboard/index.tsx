@@ -1,3 +1,4 @@
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -18,6 +19,25 @@ import { Analytics } from './components/analytics'
 import { Overview } from './components/overview'
 import { RecentSales } from './components/recent-sales'
 
+function handleDownload() {
+  const rows = [
+    ['Metric', 'Value', 'Change'],
+    ['Total Revenue', '$45,231.89', '+20.1% from last month'],
+    ['Subscriptions', '2,350', '+180.1% from last month'],
+    ['Sales', '12,234', '+19% from last month'],
+    ['Active Now', '573', '+201 since last hour'],
+  ]
+  const csv = rows.map((r) => r.join(',')).join('\n')
+  const blob = new Blob([csv], { type: 'text/csv' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'nova-analytics-dashboard.csv'
+  a.click()
+  URL.revokeObjectURL(url)
+  toast.success('Dashboard data exported successfully.')
+}
+
 export function Dashboard() {
   return (
     <>
@@ -35,7 +55,7 @@ export function Dashboard() {
         <div className='mb-2 flex items-center justify-between space-y-2'>
           <h1 className='text-2xl font-bold tracking-tight'>Dashboard</h1>
           <div className='flex items-center space-x-2'>
-            <Button>Download</Button>
+            <Button onClick={handleDownload}>Download</Button>
           </div>
         </div>
         <Tabs

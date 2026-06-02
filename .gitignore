@@ -28,6 +28,7 @@ dist-ssr
 
 # Auto-generated
 .tanstack/
+pnpm-lock.yaml
 
 # Test coverage
 /coverage

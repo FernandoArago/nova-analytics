@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Fragment } from 'react/jsx-runtime'
 import { format } from 'date-fns'
 import {
@@ -14,6 +14,7 @@ import {
   Video,
   MessagesSquare,
 } from 'lucide-react'
+import { toast } from 'sonner'
 import { cn, getDisplayNameInitials } from '@/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -27,35 +28,30 @@ import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { NewChat } from './components/new-chat'
 import { type ChatUser, type Convo } from './data/chat-types'
-// Fake Data
 import { conversations } from './data/convo.json'
 
 export function Chats() {
   const [search, setSearch] = useState('')
   const [selectedUser, setSelectedUser] = useState<ChatUser | null>(null)
-  const [mobileSelectedUser, setMobileSelectedUser] = useState<ChatUser | null>(
-    null
-  )
-  const [createConversationDialogOpened, setCreateConversationDialog] =
-    useState(false)
+  const [mobileSelectedUser, setMobileSelectedUser] = useState<ChatUser | null>(null)
+  const [createConversationDialogOpened, setCreateConversationDialog] = useState(false)
+  const [messageInput, setMessageInput] = useState('')
+  const [sentMessages, setSentMessages] = useState<Record<string, Convo[]>>({})
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  // Filtered data based on the search query
   const filteredChatList = conversations.filter(({ fullName }) =>
     fullName.toLowerCase().includes(search.trim().toLowerCase())
   )
 
-  const currentMessage = selectedUser?.messages.reduce(
+  const allMessages = selectedUser
+    ? [...selectedUser.messages, ...(sentMessages[selectedUser.id] ?? [])]
+    : []
+
+  const currentMessage = allMessages.reduce(
     (acc: Record<string, Convo[]>, obj) => {
       const key = format(obj.timestamp, 'd MMM, yyyy')
-
-      // Create an array for the category if it doesn't exist
-      if (!acc[key]) {
-        acc[key] = []
-      }
-
-      // Push the current object to the array
+      if (!acc[key]) acc[key] = []
       acc[key].push(obj)
-
       return acc
     },
     {}
@@ -63,9 +59,33 @@ export function Chats() {
 
   const users = conversations.map(({ messages, ...user }) => user)
 
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [sentMessages, selectedUser])
+
+  const handleSend = () => {
+    if (!messageInput.trim() || !selectedUser) return
+    const newMsg: Convo = {
+      sender: 'You',
+      message: messageInput.trim(),
+      timestamp: new Date().toISOString(),
+    }
+    setSentMessages((prev) => ({
+      ...prev,
+      [selectedUser.id]: [...(prev[selectedUser.id] ?? []), newMsg],
+    }))
+    setMessageInput('')
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSend()
+    }
+  }
+
   return (
     <>
-      {/* ===== Top Heading ===== */}
       <Header>
         <Search className='me-auto' />
         <ThemeSwitch />
@@ -83,7 +103,6 @@ export function Chats() {
                   <h1 className='text-2xl font-bold'>Inbox</h1>
                   <MessagesSquare size={20} />
                 </div>
-
                 <Button
                   size='icon'
                   variant='ghost'
@@ -115,7 +134,8 @@ export function Chats() {
             <ScrollArea className='-mx-3 h-full overflow-scroll p-3'>
               {filteredChatList.map((chatUsr) => {
                 const { id, profile, username, messages, fullName } = chatUsr
-                const lastConvo = messages[0]
+                const allUserMsgs = [...messages, ...(sentMessages[id] ?? [])]
+                const lastConvo = allUserMsgs[allUserMsgs.length - 1]
                 const lastMsg =
                   lastConvo.sender === 'You'
                     ? `You: ${lastConvo.message}`
@@ -126,7 +146,7 @@ export function Chats() {
                       type='button'
                       className={cn(
                         'group hover:bg-accent hover:text-accent-foreground',
-                        `flex w-full rounded-md px-2 py-2 text-start text-sm`,
+                        'flex w-full rounded-md px-2 py-2 text-start text-sm',
                         selectedUser?.id === id && 'sm:bg-muted'
                       )}
                       onClick={() => {
@@ -168,7 +188,6 @@ export function Chats() {
             >
               {/* Top Part */}
               <div className='mb-1 flex flex-none justify-between bg-card p-4 shadow-lg sm:rounded-t-md'>
-                {/* Left */}
                 <div className='flex gap-3'>
                   <Button
                     size='icon'
@@ -180,10 +199,7 @@ export function Chats() {
                   </Button>
                   <div className='flex items-center gap-2 lg:gap-4'>
                     <Avatar className='size-9 lg:size-11'>
-                      <AvatarImage
-                        src={selectedUser.profile}
-                        alt={selectedUser.username}
-                      />
+                      <AvatarImage src={selectedUser.profile} alt={selectedUser.username} />
                       <AvatarFallback>
                         {getDisplayNameInitials(selectedUser.fullName)}
                       </AvatarFallback>
@@ -199,12 +215,12 @@ export function Chats() {
                   </div>
                 </div>
 
-                {/* Right */}
                 <div className='-me-1 flex items-center gap-1 lg:gap-2'>
                   <Button
                     size='icon'
                     variant='ghost'
                     className='hidden size-8 rounded-full sm:inline-flex lg:size-10'
+                    onClick={() => toast.info('Video call feature coming soon.')}
                   >
                     <Video size={22} className='stroke-muted-foreground' />
                   </Button>
@@ -212,6 +228,7 @@ export function Chats() {
                     size='icon'
                     variant='ghost'
                     className='hidden size-8 rounded-full sm:inline-flex lg:size-10'
+                    onClick={() => toast.info('Phone call feature coming soon.')}
                   >
                     <Phone size={22} className='stroke-muted-foreground' />
                   </Button>
@@ -219,6 +236,7 @@ export function Chats() {
                     size='icon'
                     variant='ghost'
                     className='h-10 rounded-md sm:h-8 sm:w-4 lg:h-10 lg:w-6'
+                    onClick={() => toast.info('More options coming soon.')}
                   >
                     <MoreVertical className='stroke-muted-foreground sm:size-5' />
                   </Button>
@@ -258,10 +276,14 @@ export function Chats() {
                             <div className='text-center text-xs'>{key}</div>
                           </Fragment>
                         ))}
+                      <div ref={messagesEndRef} />
                     </div>
                   </div>
                 </div>
-                <form className='flex w-full flex-none gap-2'>
+                <form
+                  className='flex w-full flex-none gap-2'
+                  onSubmit={(e) => { e.preventDefault(); handleSend() }}
+                >
                   <div className='flex flex-1 items-center gap-2 rounded-md border border-input bg-card px-2 py-1 focus-within:ring-1 focus-within:ring-ring focus-within:outline-hidden lg:gap-4'>
                     <div className='space-x-1'>
                       <Button
@@ -269,6 +291,7 @@ export function Chats() {
                         type='button'
                         variant='ghost'
                         className='h-8 rounded-md'
+                        onClick={() => toast.info('Attachment feature coming soon.')}
                       >
                         <Plus size={20} className='stroke-muted-foreground' />
                       </Button>
@@ -277,41 +300,46 @@ export function Chats() {
                         type='button'
                         variant='ghost'
                         className='hidden h-8 rounded-md lg:inline-flex'
+                        onClick={() => toast.info('Image sharing coming soon.')}
                       >
-                        <ImagePlus
-                          size={20}
-                          className='stroke-muted-foreground'
-                        />
+                        <ImagePlus size={20} className='stroke-muted-foreground' />
                       </Button>
                       <Button
                         size='icon'
                         type='button'
                         variant='ghost'
                         className='hidden h-8 rounded-md lg:inline-flex'
+                        onClick={() => toast.info('File attachment coming soon.')}
                       >
-                        <Paperclip
-                          size={20}
-                          className='stroke-muted-foreground'
-                        />
+                        <Paperclip size={20} className='stroke-muted-foreground' />
                       </Button>
                     </div>
                     <label className='flex-1'>
                       <span className='sr-only'>Chat Text Box</span>
                       <input
                         type='text'
-                        placeholder='Type your messages...'
+                        placeholder='Type your message...'
                         className='h-8 w-full bg-inherit focus-visible:outline-hidden'
+                        value={messageInput}
+                        onChange={(e) => setMessageInput(e.target.value)}
+                        onKeyDown={handleKeyDown}
                       />
                     </label>
                     <Button
+                      type='submit'
                       variant='ghost'
                       size='icon'
                       className='hidden sm:inline-flex'
+                      disabled={!messageInput.trim()}
                     >
                       <Send size={20} />
                     </Button>
                   </div>
-                  <Button className='h-full sm:hidden'>
+                  <Button
+                    type='submit'
+                    className='h-full sm:hidden'
+                    disabled={!messageInput.trim()}
+                  >
                     <Send size={18} /> Send
                   </Button>
                 </form>

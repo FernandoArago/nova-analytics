@@ -1,6 +1,7 @@
 import { type ChangeEvent, useState } from 'react'
 import { getRouteApi } from '@tanstack/react-router'
 import { SlidersHorizontal, ArrowUpAZ, ArrowDownAZ } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -17,7 +18,7 @@ import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { apps } from './data/apps'
+import { apps as initialApps } from './data/apps'
 
 const route = getRouteApi('/_authenticated/apps/')
 
@@ -40,8 +41,11 @@ export function Apps() {
   const [sort, setSort] = useState(initSort)
   const [appType, setAppType] = useState(type)
   const [searchTerm, setSearchTerm] = useState(filter)
+  const [connectedApps, setConnectedApps] = useState<Set<string>>(
+    () => new Set(initialApps.filter((a) => a.connected).map((a) => a.name))
+  )
 
-  const filteredApps = apps
+  const filteredApps = initialApps
     .sort((a, b) =>
       sort === 'asc'
         ? a.name.localeCompare(b.name)
@@ -49,12 +53,26 @@ export function Apps() {
     )
     .filter((app) =>
       appType === 'connected'
-        ? app.connected
+        ? connectedApps.has(app.name)
         : appType === 'notConnected'
-          ? !app.connected
+          ? !connectedApps.has(app.name)
           : true
     )
     .filter((app) => app.name.toLowerCase().includes(searchTerm.toLowerCase()))
+
+  const handleToggleConnect = (appName: string) => {
+    const isConnected = connectedApps.has(appName)
+    setConnectedApps((prev) => {
+      const next = new Set(prev)
+      isConnected ? next.delete(appName) : next.add(appName)
+      return next
+    })
+    toast.success(
+      isConnected
+        ? `${appName} disconnected successfully.`
+        : `${appName} connected successfully.`
+    )
+  }
 
   const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value)
@@ -83,7 +101,6 @@ export function Apps() {
 
   return (
     <>
-      {/* ===== Top Heading ===== */}
       <Header>
         <Search className='me-auto' />
         <ThemeSwitch />
@@ -91,7 +108,6 @@ export function Apps() {
         <ProfileDropdown />
       </Header>
 
-      {/* ===== Content ===== */}
       <Main fixed>
         <div>
           <h1 className='text-2xl font-bold tracking-tight'>
@@ -145,31 +161,37 @@ export function Apps() {
         </div>
         <Separator className='shadow-sm' />
         <ul className='faded-bottom no-scrollbar grid gap-4 overflow-auto pt-4 pb-16 md:grid-cols-2 lg:grid-cols-3'>
-          {filteredApps.map((app) => (
-            <li
-              key={app.name}
-              className='rounded-lg border p-4 hover:shadow-md'
-            >
-              <div className='mb-8 flex items-center justify-between'>
-                <div
-                  className={`flex size-10 items-center justify-center rounded-lg bg-muted p-2`}
-                >
-                  {app.logo}
+          {filteredApps.map((app) => {
+            const isConnected = connectedApps.has(app.name)
+            return (
+              <li
+                key={app.name}
+                className='rounded-lg border p-4 hover:shadow-md'
+              >
+                <div className='mb-8 flex items-center justify-between'>
+                  <div className='flex size-10 items-center justify-center rounded-lg bg-muted p-2'>
+                    {app.logo}
+                  </div>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    onClick={() => handleToggleConnect(app.name)}
+                    className={
+                      isConnected
+                        ? 'border border-blue-300 bg-blue-50 hover:bg-red-50 hover:border-red-300 hover:text-red-600 dark:border-blue-700 dark:bg-blue-950 dark:hover:bg-red-950 dark:hover:border-red-700 dark:hover:text-red-400'
+                        : ''
+                    }
+                  >
+                    {isConnected ? 'Connected' : 'Connect'}
+                  </Button>
                 </div>
-                <Button
-                  variant='outline'
-                  size='sm'
-                  className={`${app.connected ? 'border border-blue-300 bg-blue-50 hover:bg-blue-100 dark:border-blue-700 dark:bg-blue-950 dark:hover:bg-blue-900' : ''}`}
-                >
-                  {app.connected ? 'Connected' : 'Connect'}
-                </Button>
-              </div>
-              <div>
-                <h2 className='mb-1 font-semibold'>{app.name}</h2>
-                <p className='line-clamp-2 text-gray-500'>{app.desc}</p>
-              </div>
-            </li>
-          ))}
+                <div>
+                  <h2 className='mb-1 font-semibold'>{app.name}</h2>
+                  <p className='line-clamp-2 text-gray-500'>{app.desc}</p>
+                </div>
+              </li>
+            )
+          })}
         </ul>
       </Main>
     </>

@@ -24,7 +24,8 @@ The reviewers evaluate both the final product AND how effectively AI-assisted de
 | Original repo | https://github.com/satnaing/shadcn-admin |
 | Stack | Vite + React + TypeScript + shadcn/ui + Tailwind CSS v4 |
 | License | MIT |
-| Fork URL | https://github.com/AragonRogelio/nova-analytics |
+| Fork URL | https://github.com/FernandoArago/nova-analytics |
+| Live URL | https://nova-analytics.onrender.com |
 | Local path | C:\Users\ferna\Desktop\CD\nova-analytics |
 
 ---
@@ -112,12 +113,14 @@ The reviewers evaluate both the final product AND how effectively AI-assisted de
 - [x] Update sidebar Dashboard link: `/` → `/dashboard`
 - [x] Update sign-in/sign-up redirects: `/` → `/dashboard`
 
-### Phase 5 — Deploy
-- [ ] Push final code to GitHub
-- [ ] Create Render Static Site — build: `npm run build`, publish: `dist`
-- [ ] Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in Render dashboard
-- [ ] Verify live URL: `novaanalytics.onrender.com`
-- [ ] Verify HTTPS active
+### Phase 5 — Deploy ✅
+- [x] Push final code to GitHub (`FernandoArago/nova-analytics`)
+- [x] Create Render Static Site — build: `npm install && npm run build`, publish: `dist`
+- [x] Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in Render dashboard
+- [x] Fix deploy: removed `pnpm-lock.yaml` from repo (Render was forcing pnpm, ignoring build command)
+- [x] Add `public/_redirects` for SPA client-side routing
+- [x] Live URL confirmed: https://nova-analytics.onrender.com
+- [x] HTTPS active (Render provides it automatically)
 - [ ] Test full flow: landing → sign-up → sign-in → dashboard → sign-out
 
 ---
