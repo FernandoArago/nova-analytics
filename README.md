@@ -1,119 +1,117 @@
-# Shadcn Admin Dashboard
+# Nova Analytics
 
-Admin Dashboard UI crafted with Shadcn and Vite. Built with responsiveness and accessibility in mind.
+A modern analytics dashboard built with React, Vite, shadcn/ui, and Supabase Auth. Deployed on Render.
 
-![alt text](public/images/shadcn-admin.png)
+## Live Demo
 
-[![Sponsored by Clerk](https://img.shields.io/badge/Sponsored%20by-Clerk-5b6ee1?logo=clerk)](https://go.clerk.com/GttUAaK)
-
-I've been creating dashboard UIs at work and for my personal projects. I always wanted to make a reusable collection of dashboard UI for future projects; and here it is now. While I've created a few custom components, some of the code is directly adapted from ShadcnUI examples.
-
-> This is not a starter project (template) though. I'll probably make one in the future.
+- **URL:** https://novaanalytics.onrender.com
+- **Test credentials:** `admin@novaanalytics.io` / _(provided separately)_
 
 ## Features
 
+- Public landing page with product overview
+- Supabase email/password authentication (sign up, sign in, sign out)
+- Protected dashboard routes — unauthenticated users are redirected to sign in
+- Dashboard with charts, tasks, users, apps, chats, and settings pages
 - Light/dark mode
-- Responsive
-- Accessible
-- With built-in Sidebar component
-- Global search command
-- 10+ pages
-- Extra custom components
-- RTL support
-
-<details>
-<summary>Customized Components (click to expand)</summary>
-
-This project uses Shadcn UI components, but some have been slightly modified for better RTL (Right-to-Left) support and other improvements. These customized components differ from the original Shadcn UI versions.
-
-If you want to update components using the Shadcn CLI (e.g., `npx shadcn@latest add <component>`), it's generally safe for non-customized components. For the listed customized ones, you may need to manually merge changes to preserve the project's modifications and avoid overwriting RTL support or other updates.
-
-> If you don't require RTL support, you can safely update the 'RTL Updated Components' via the Shadcn CLI, as these changes are primarily for RTL compatibility. The 'Modified Components' may have other customizations to consider.
-
-### Modified Components
-
-- scroll-area
-- sonner
-- separator
-
-### RTL Updated Components
-
-- alert-dialog
-- calendar
-- command
-- dialog
-- dropdown-menu
-- select
-- table
-- sheet
-- sidebar
-- switch
-
-**Notes:**
-
-- **Modified Components**: These have general updates, potentially including RTL adjustments.
-- **RTL Updated Components**: These have specific changes for RTL language support (e.g., layout, positioning).
-- For implementation details, check the source files in `src/components/ui/`.
-- All other Shadcn UI components in the project are standard and can be safely updated via the CLI.
-
-</details>
+- Fully responsive (mobile + desktop)
+- Nova Analytics branding (indigo/violet color palette)
 
 ## Tech Stack
 
-**UI:** [ShadcnUI](https://ui.shadcn.com) (TailwindCSS + RadixUI)
+| Layer | Technology |
+|-------|-----------|
+| Framework | React 19 + TypeScript |
+| Build tool | Vite 8 |
+| Routing | TanStack Router v1 (file-based) |
+| Data fetching | TanStack Query v5 |
+| UI | shadcn/ui + Radix UI + Tailwind CSS v4 |
+| State | Zustand v5 |
+| Forms | React Hook Form + Zod v4 |
+| Auth | Supabase Auth (email/password) |
+| Charts | Recharts v3 |
+| Testing | Vitest + Playwright |
+| Deploy | Render Static Site |
 
-**Build Tool:** [Vite](https://vitejs.dev/)
+## Getting Started Locally
 
-**Routing:** [TanStack Router](https://tanstack.com/router/latest)
-
-**Type Checking:** [TypeScript](https://www.typescriptlang.org/)
-
-**Linting/Formatting:** [ESLint](https://eslint.org/) & [Prettier](https://prettier.io/)
-
-**Icons:** [Lucide Icons](https://lucide.dev/icons/), [Tabler Icons](https://tabler.io/icons) (Brand icons only)
-
-**Auth (partial):** [Clerk](https://go.clerk.com/GttUAaK)
-
-## Run Locally
-
-Clone the project
-
-```bash
-  git clone https://github.com/satnaing/shadcn-admin.git
-```
-
-Go to the project directory
+### 1. Clone the repo
 
 ```bash
-  cd shadcn-admin
+git clone https://github.com/AragonRogelio/nova-analytics.git
+cd nova-analytics
 ```
 
-Install dependencies
+### 2. Install dependencies
 
 ```bash
-  pnpm install
+npm install
 ```
 
-Start the server
+### 3. Set up environment variables
+
+Create a `.env.local` file in the project root:
+
+```env
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+Get these values from your Supabase project: **Settings → API → Project URL & anon key**.
+
+> Never commit `.env.local` to the repository.
+
+### 4. Run the dev server
 
 ```bash
-  pnpm run dev
+npm run dev
 ```
 
-## Sponsoring this project ❤️
+Visit `http://localhost:5173`.
 
-If you find this project helpful or use this in your own work, consider [sponsoring me](https://github.com/sponsors/satnaing) to support development and maintenance. You can [buy me a coffee](https://buymeacoffee.com/satnaing) as well. Don’t worry, every penny helps. Thank you! 🙏
+## Supabase Setup
 
-For questions or sponsorship inquiries, feel free to reach out at [satnaingdev@gmail.com](mailto:satnaingdev@gmail.com).
+1. Create a project at [supabase.com](https://supabase.com)
+2. Go to **Authentication → Providers → Email** and disable "Confirm email" for instant sign-up
+3. Create a test user at **Authentication → Users**
+4. Copy the **Project URL** and **anon public key** to `.env.local`
 
-### Current Sponsor
+## Deployment (Render)
 
-- [Clerk](https://go.clerk.com/GttUAaK) - authentication and user management for the modern web
+1. Push the repo to GitHub
+2. Create a new **Static Site** on [render.com](https://render.com)
+3. Set build command: `npm run build`
+4. Set publish directory: `dist`
+5. Add environment variables: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
+6. Deploy — Render auto-deploys on every push to `main`
 
-## Author
+## Project Structure
 
-Crafted with 🤍 by [@satnaing](https://github.com/satnaing)
+```
+src/
+├── features/
+│   ├── landing/        ← Public landing page
+│   ├── auth/           ← Sign in, sign up, forgot password
+│   ├── dashboard/      ← Main dashboard
+│   ├── users/          ← User management
+│   ├── tasks/          ← Task list
+│   ├── chats/          ← Chat UI
+│   └── settings/       ← Account settings
+├── routes/
+│   ├── index.tsx           ← / (landing page, public)
+│   ├── _authenticated/     ← Protected layout (Supabase session guard)
+│   │   └── dashboard/      ← /dashboard
+│   └── (auth)/             ← /sign-in, /sign-up
+├── lib/
+│   └── supabase.ts     ← Supabase client
+└── stores/
+    └── auth-store.ts   ← Zustand auth state
+```
+
+## Base Project
+
+This project is a whitelabel fork of [satnaing/shadcn-admin](https://github.com/satnaing/shadcn-admin) (MIT License), customized for Nova Analytics as part of a trial assignment for Dot Com Media.
 
 ## License
 
-Licensed under the [MIT License](https://choosealicense.com/licenses/mit/)
+MIT

@@ -1,4 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" width="24" height="24"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokewidth="2" strokelinecap="round" strokelinejoin="round">
-  <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"></path>
-</svg><style>@media (prefers-color-scheme: light) { :root { filter: contrast(1) brightness(0.8); } }
-</style></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <rect width="32" height="32" rx="6" fill="#6366f1"/>
+  <rect x="4" y="18" width="5" height="10" rx="1" fill="white"/>
+  <rect x="11" y="12" width="5" height="16" rx="1" fill="white"/>
+  <rect x="18" y="6" width="5" height="22" rx="1" fill="white"/>
+  <path d="M27 4 L27.8 6.5 L30.5 7 L27.8 7.5 L27 10 L26.2 7.5 L23.5 7 L26.2 6.5 Z" fill="#a5f3fc"/>
+</svg>
